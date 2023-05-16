@@ -2,7 +2,7 @@
 # 2
 # <<"COMMENT"
 python3 train_roberta.py --do_train \
-                         --dataset="pdtb2" \
+                         --dataset="test" \
                          --label_file="labels_level_1.txt" \
                          --use_conn \
                          --teacher_forcing

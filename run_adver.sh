@@ -2,7 +2,7 @@
 # 2
 # <<"COMMENT"
 python3 train_adv.py --do_train \
-                     --dataset="pdtb2" \
+                     --dataset="test" \
                      --label_file="labels_level_1.txt"
 # COMMENT
 # 8

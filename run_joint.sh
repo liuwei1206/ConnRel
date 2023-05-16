@@ -2,7 +2,7 @@
 # 2
 # <<"COMMENT"
 python3 train_joint_conn_rel.py --do_train \
-                                --dataset="pdtb2" \
+                                --dataset="test" \
                                 --label_file="labels_level_1.txt" \
                                 --sample_k=100
 # COMMENT

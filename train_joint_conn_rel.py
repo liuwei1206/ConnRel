@@ -205,7 +205,8 @@ def train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, labe
             best_test = test_acc + test_f1
             best_test_epoch = epoch
 
-        output_dir = os.path.join(args.output_dir, TIME_CHECKPOINT_DIR)
+        # output_dir = os.path.join(args.output_dir, TIME_CHECKPOINT_DIR)
+        output_dir = os.path.join(args.output_dir, "joint")
         output_dir = os.path.join(output_dir, f"{PREFIX_CHECKPOINT_DIR}_{epoch}")
         # os.makedirs(output_dir, exist_ok=True)
         # torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))

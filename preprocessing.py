@@ -302,17 +302,18 @@ if __name__ == "__main__":
         "12", "13", "14", "15", "16", "17", "18", "19", "20"
     ]
     output_dir = "data/dataset/pdtb2/fine"
+    os.makedirs(output_dir, exist_ok=True)
     mode = "train"
-    # refine_raw_data_pdtb2(source_dir=source_dir, data_list=data_list, output_dir=output_dir, mode=mode)
+    refine_raw_data_pdtb2(source_dir=source_dir, data_list=data_list, output_dir=output_dir, mode=mode)
 
     data_list = ["00", "01"]
     mode = "dev"
-    # refine_raw_data_pdtb2(source_dir=source_dir, data_list=data_list, output_dir=output_dir, mode=mode)
+    refine_raw_data_pdtb2(source_dir=source_dir, data_list=data_list, output_dir=output_dir, mode=mode)
 
     data_list = ["21", "22"]
     mode = "test"
-    # refine_raw_data_pdtb2(source_dir=source_dir, data_list=data_list, output_dir=output_dir, mode=mode)
-    # generate_label_file(output_dir)
+    refine_raw_data_pdtb2(source_dir=source_dir, data_list=data_list, output_dir=output_dir, mode=mode)
+    generate_label_file(output_dir)
 
     ## 2. Xval
     # X-validation
@@ -338,12 +339,12 @@ if __name__ == "__main__":
         output_dir = "data/dataset/pdtb2/xval/fold_{}".format(idx + 1)
         os.makedirs(output_dir, exist_ok=True)
         mode = "train"
-        # refine_raw_data_pdtb2(source_dir, train_sections[idx], output_dir, mode)
+        refine_raw_data_pdtb2(source_dir, train_sections[idx], output_dir, mode)
         mode = "dev"
-        # refine_raw_data_pdtb2(source_dir, dev_sections[idx], output_dir, mode)
+        refine_raw_data_pdtb2(source_dir, dev_sections[idx], output_dir, mode)
         mode = "test"
-        # refine_raw_data_pdtb2(source_dir, test_sections[idx], output_dir, mode)
-        # generate_label_file(output_dir)
+        refine_raw_data_pdtb2(source_dir, test_sections[idx], output_dir, mode)
+        generate_label_file(output_dir)
 
 
     #### PDTB3.0
@@ -355,6 +356,7 @@ if __name__ == "__main__":
         "12", "13", "14", "15", "16", "17", "18", "19", "20"
     ]
     output_dir = "data/dataset/pdtb3/fine"
+    os.makedirs(output_dir, exist_ok=True)
     mode = "train"
     # refine_raw_data_pdtb3(source_dir=source_dir, gold_dir=gold_dir, data_list=data_list, output_dir=output_dir, mode=mode)
 

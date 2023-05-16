@@ -175,10 +175,10 @@ def train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, labe
 
         # evaluation and save
         model.eval()
-        train_conn_acc, train_acc, train_f1 = evaluate(
-            model, args, train_dataset, conn_list, label_list,
-            tokenizer, epoch, desc="train"
-        )
+        # train_conn_acc, train_acc, train_f1 = evaluate(
+        #     model, args, train_dataset, conn_list, label_list,
+        #     tokenizer, epoch, desc="train"
+        # )
         dev_conn_acc, dev_acc, dev_f1 = evaluate(
             model, args, dev_dataset, conn_list, label_list,
             tokenizer, epoch, desc="dev"
@@ -189,7 +189,7 @@ def train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, labe
         )
         res_list.append((dev_acc, dev_f1, test_acc, test_f1))
         print(" Epoch=%d"%(epoch))
-        print(" Train conn_acc=%.4f, acc=%.4f, f1=%.4f"%(epoch, train_conn_acc, train_acc, train_f1))
+        # print(" Train conn_acc=%.4f, acc=%.4f, f1=%.4f"%(train_conn_acc, train_acc, train_f1))
         print(" Dev conn_acc=%.4f, acc=%.4f, f1=%.4f"%(dev_conn_acc, dev_acc, dev_f1))
         print(" Test conn_acc=%.4f, acc=%.4f, f1=%.4f"%(test_conn_acc, test_acc, test_f1))
         if dev_acc+dev_f1 > best_dev:
@@ -200,10 +200,11 @@ def train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, labe
             best_test = test_acc + test_f1
             best_test_epoch = epoch
 
-        output_dir = os.path.join(args.output_dir, TIME_CHECKPOINT_DIR)
+        # output_dir = os.path.join(args.output_dir, TIME_CHECKPOINT_DIR)
+        output_dir = os.path.join(args.output_dir, "model")
         output_dir = os.path.join(output_dir, f"{PREFIX_CHECKPOINT_DIR}_{epoch}")
-        # os.makedirs(output_dir, exist_ok=True)
-        # torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
+        os.makedirs(output_dir, exist_ok=True)
+        torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
 
     print(" Best dev: epoch=%d, acc=%.4f, f1=%.4f" % (
         best_dev_epoch, res_list[best_dev-1][0], res_list[best_dev-1][1])
