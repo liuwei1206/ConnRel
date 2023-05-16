@@ -274,6 +274,25 @@ def refine_raw_data_pdtb3(source_dir, gold_dir, data_list, output_dir, mode):
         for sample in all_samples:
             f.write("%s\n" % (json.dumps(sample, ensure_ascii=False)))
 
+def write_labels_to_file(file_path, label_list):
+    with open(file_path, "w", encoding="utf-8") as f:
+        for label in label_list:
+            f.write("%s\n"%(label))
+
+def generate_label_file(data_dir):
+    if "pdtb2" in data_dir:
+        label1_file = os.path.join(data_dir, "labels_level_1.txt")
+        label1_list = ["Comparison", "Contingency", "Expansion", "Temporal"]
+        label2_file = os.path.join(data_dir, "labels_level_2.txt")
+        label2_list = ['Asynchronous', 'Synchrony', 'Cause', 'Pragmatic Cause', 'Contrast', 'Concession', 'Conjunction', 'Instantiation', 'Restatement', 'Alternative', 'List']
+    elif "pdtb3" in data_dir:
+        label1_file = os.path.join(data_dir, "labels_level_1.txt")
+        label1_list = ["Comparison", "Contingency", "Expansion", "Temporal"]
+        label2_file = os.path.join(data_dir, "labels_level_2.txt")
+        label2_list = ['Concession', 'Contrast', 'Cause', 'Cause+Belief', 'Condition', 'Purpose', 'Conjunction', 'Equivalence', 'Instantiation', 'Level-of-detail', 'Manner', 'Substitution', 'Asynchronous', 'Synchronous']
+    write_labels_to_file(label1_file, label1_list)
+    write_labels_to_file(label2_file, label2_list)
+
 if __name__ == "__main__":
     #### PDTB2.0
     ## 1. Ji split
@@ -293,6 +312,7 @@ if __name__ == "__main__":
     data_list = ["21", "22"]
     mode = "test"
     # refine_raw_data_pdtb2(source_dir=source_dir, data_list=data_list, output_dir=output_dir, mode=mode)
+    # generate_label_file(output_dir)
 
     ## 2. Xval
     # X-validation
@@ -323,6 +343,7 @@ if __name__ == "__main__":
         # refine_raw_data_pdtb2(source_dir, dev_sections[idx], output_dir, mode)
         mode = "test"
         # refine_raw_data_pdtb2(source_dir, test_sections[idx], output_dir, mode)
+        # generate_label_file(output_dir)
 
 
     #### PDTB3.0
@@ -344,6 +365,7 @@ if __name__ == "__main__":
     data_list = ["21", "22"]
     mode = "test"
     # refine_raw_data_pdtb3(source_dir=source_dir, gold_dir=gold_dir, data_list=data_list, output_dir=output_dir, mode=mode)
+    # generate_label_file(output_dir)
 
     ## 2 Xval
     # X-validation
@@ -373,3 +395,4 @@ if __name__ == "__main__":
         # refine_raw_data_pdtb3(source_dir=source_dir, gold_dir=gold_dir, data_list=dev_sections[idx], output_dir=output_dir, mode=mode)
         mode = "test"
         # refine_raw_data_pdtb3(source_dir=source_dir, gold_dir=gold_dir, data_list=test_sections[idx], output_dir=output_dir, mode=mode)
+        # generate_label_file(output_dir)
