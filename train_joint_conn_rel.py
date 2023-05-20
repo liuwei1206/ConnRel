@@ -399,8 +399,8 @@ def main():
             )
             print("Test: conn_acc=%.4f, acc=%.4f, f1=%.4f\n" % (conn_acc, acc, f1))
         """
-        dev_dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
-        test_dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
+        # dev_dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
+        test_dataset = JointRobertaBaseDataset(test_data_file, params=dataset_params)
         join = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
         temp_file = join
         for epoch in range(3, 11):
@@ -409,11 +409,11 @@ def main():
             model.load_state_dict(torch.load(checkpoint_file))
             model.eval()
 
-            conn_acc, acc, f1 = evaluate(
-                model, args, dev_dataset, conn_list, label_list, tokenizer,
-                epoch, desc="dev", write_file=False
-            )
-            print(" Dev: conn_acc=%.4f, acc=%.4f, f1=%.4f" % (conn_acc, acc, f1))
+            # conn_acc, acc, f1 = evaluate(
+            #     model, args, dev_dataset, conn_list, label_list, tokenizer,
+            #     epoch, desc="dev", write_file=False
+            # )
+            # print(" Dev: conn_acc=%.4f, acc=%.4f, f1=%.4f" % (conn_acc, acc, f1))
             conn_acc, acc, f1 = evaluate(
                 model, args, test_dataset, conn_list, label_list, tokenizer,
                 epoch, desc="test", write_file=False
