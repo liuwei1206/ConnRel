@@ -567,10 +567,13 @@ def main():
         train_rel(rel_model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        checkpoint_file = ""
-        epoch = 0
+        """
+        # l1_ji, 5, 8, 9, 5, 9
+        seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
+        epoch = seed_epoch[args.seed]
+        checkpoint_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin".format(epoch))
+        print(checkpoint_file)
         rel_model.load_state_dict(torch.load(checkpoint_file))
-        args.output_dir = os.path.dirname(checkpoint_file)
         rel_model.eval()
 
         # dataset = RobertaBaseDataset(train_data_file, params=dataset_params)
@@ -593,6 +596,27 @@ def main():
                 epoch, desc="test", write_file=False
             )
             print("Test: acc=%.4f, f1=%.4f\n" % (acc, f1))
+        """
+        # dev_dataset = RobertaBaseDataset(dev_data_file, params=dataset_params)
+        test_dataset = RobertaBaseDataset(test_data_file, params=dataset_params)
+        temp_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
+        for epoch in range(3, 11):
+            checkpoint_file = temp_file.format(epoch)
+            print(" Epoch %d, %s" % (epoch, checkpoint_file))
+            model.load_state_dict(torch.load(checkpoint_file))
+            model.eval()
+
+            # acc, f1 = evaluate_rel(
+            #     rel_model, args, dev_dataset, label_list, tokenizer,
+            #     epoch, desc="dev", write_file=False
+            # )
+            # print(" Dev: acc=%.4f, f1=%.4f" % (acc, f1))
+            acc, f1 = evaluate_rel(
+                rel_model, args, test_dataset, label_list, tokenizer,
+                epoch, desc="test", write_file=False
+            )
+            print(" Test: acc=%.4f, f1=%.4f" % (acc, f1))
+            print()
 
 if __name__ == "__main__":
     main()

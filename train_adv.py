@@ -546,12 +546,10 @@ def main():
 
     if args.do_dev or args.do_test:
         """
-        check_dir = os.path.join(args.output_dir, "joint_train/model")
         # l1_ji, 9, 5, 10, 10, 10
-        # l2_ji
         seed_epoch = {106524: 9, 106464: 5, 106537: 10, 219539: 10, 430683: 10}
         epoch = seed_epoch[args.seed]
-        checkpoint_file = os.path.join(check_dir, "checkpoint_{}/pytorch_model.bin".format(epoch))
+        checkpoint_file = os.path.join(args.output_dir, "joint_train/model/checkpoint_{}/pytorch_model.bin".format(epoch))
         model.load_state_dict(torch.load(checkpoint_file))
         args.output_dir = os.path.dirname(checkpoint_file)
         model.eval()
@@ -569,7 +567,7 @@ def main():
             )
             print(" Test: acc=%.4f, f1=%.4f\n"%(acc, f1))
         """
-        # dev_dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
+        # dev_dataset = AdversarialDataset(dev_data_file, params=dataset_params)
         test_dataset = AdversarialDataset(test_data_file, params=dataset_params)
         join = os.path.join(args.output_dir, "joint_train/model/checkpoint_{}/pytorch_model.bin")
         temp_file = join
@@ -582,11 +580,11 @@ def main():
             # acc, f1 = joint_evaluate(
             #     model, args, dev_dataset, label_list, tokenizer, epoch, desc="dev", write_file=True
             # )
-            # print(" Dev: acc=%.4f, f1=%.4f\n" % (acc, f1))
+            # print(" Dev: acc=%.4f, f1=%.4f" % (acc, f1))
             acc, f1 = joint_evaluate(
                 model, args, test_dataset, label_list, tokenizer, epoch, desc="test", write_file=True
             )
-            print(" Test: acc=%.4f, f1=%.4f\n" % (acc, f1))
+            print(" Test: acc=%.4f, f1=%.4f" % (acc, f1))
             print()
 
 if __name__ == "__main__":

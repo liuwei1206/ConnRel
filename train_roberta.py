@@ -345,8 +345,11 @@ def main():
         train(model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        checkpoint_file = "data/result/pdtb2_exp/roberta/normal/checkpoint_9/pytorch_model.bin"
-        epoch = 9
+        # l1_ji, 5, 8, 9, 5, 9
+        seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
+        epoch = seed_epoch[args.seed]
+        checkpoint_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin".format(epoch))
+        print(checkpoint_file)
         model.load_state_dict(torch.load(checkpoint_file))
         args.output_dir = os.path.dirname(checkpoint_file)
         model.eval()

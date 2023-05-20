@@ -366,14 +366,11 @@ def main():
 
     if args.do_dev or args.do_test:
         """
-        check_dir = os.path.join(args.output_dir, "model")
         # l1_ji, 5, 8, 9, 5, 9
-        # l2_ji
         seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
         epoch = seed_epoch[args.seed]
-        checkpoint_file = os.path.join(check_dir, "checkpoint_{}/pytorch_model.bin".format(epoch))
+        checkpoint_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin".format(epoch))
         print(checkpoint_file)
-        args.output_dir = os.path.dirname(checkpoint_file)
         model.load_state_dict(torch.load(checkpoint_file))
         model.eval()
         
@@ -401,8 +398,7 @@ def main():
         """
         # dev_dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
         test_dataset = JointRobertaBaseDataset(test_data_file, params=dataset_params)
-        join = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
-        temp_file = join
+        temp_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
         for epoch in range(3, 11):
             checkpoint_file = temp_file.format(epoch)
             print(" Epoch %d, %s"%(epoch, checkpoint_file))
