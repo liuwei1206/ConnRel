@@ -38,7 +38,7 @@ sleep 10s
 # For xval, change the dataset to pdtb2 or pdtb3
 # 39
 # <<"COMMENT"
-for idx in 1 2 3 4 5 6 7 8 8 10 11 12
+for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_roberta.py --do_train \
                              --dataset="pdtb2" \
@@ -52,7 +52,7 @@ sleep 10s
 
 # 53
 # <<"COMMENT"
-for idx in 1 2 3 4 5 6 7 8 8 10 11 12
+for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_roberta.py --do_train \
                              --dataset="pdtb2" \

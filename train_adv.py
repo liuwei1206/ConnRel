@@ -388,10 +388,10 @@ def joint_train(model, args, train_dataset, dev_dataset, test_dataset, label_lis
         torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
 
     print(" Best dev: epoch=%d, acc=%.4f, f1=%.4f" % (
-        best_dev_epoch, res_list[best_dev-1][0], res_list[best_dev-1][1])
+        best_dev_epoch, res_list[best_dev_epoch-1][0], res_list[best_dev_epoch-1][1])
     )
     print(" Best test: epoch=%d, acc=%.4f, f1=%.4f\n" % (
-        best_test_epoch, res_list[best_test-1][2], res_list[best_test-1][3])
+        best_test_epoch, res_list[best_test_epoch-1][2], res_list[best_test_epoch-1][3])
     )
 
 def joint_evaluate(model, args, dataset, label_list, tokenizer, epoch, desc="dev", write_file=False):
@@ -545,8 +545,12 @@ def main():
         joint_train(model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        checkpoint_file = ""
-        epoch = 0
+        check_dir = os.path.join(args.output_dir, "joint_train/model")
+        # l1_ji, 9, 5, 10, 10, 10
+        # l2_ji
+        seed_epoch = {106524: 9, 106464: 5, 106537: 10, 219539: 10, 430683: 10}
+        epoch = seed_epoch[args.seed]
+        checkpoint_file = os.path.join(check_dir, "checkpoint_{}/pytorch_model.bin".format(epoch))
         model.load_state_dict(torch.load(checkpoint_file))
         args.output_dir = os.path.dirname(checkpoint_file)
         model.eval()
@@ -554,13 +558,13 @@ def main():
         if args.do_dev:
             dataset = AdversarialDataset(dev_data_file, params=dataset_params)
             acc, f1 = joint_evaluate(
-                model, args, dataset, label_list, tokenizer, epoch, desc="dev", write_file=False
+                model, args, dataset, label_list, tokenizer, epoch, desc="dev", write_file=True
             )
             print(" Dev: acc=%.4f, f1=%.4f\n"%(acc, f1))
         if args.do_test:
             dataset = AdversarialDataset(test_data_file, params=dataset_params)
             acc, f1 = joint_evaluate(
-                model, args, dataset, label_list, tokenizer, epoch, desc="test", write_file=False
+                model, args, dataset, label_list, tokenizer, epoch, desc="test", write_file=True
             )
             print(" Test: acc=%.4f, f1=%.4f\n"%(acc, f1))
 

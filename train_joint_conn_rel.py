@@ -206,16 +206,16 @@ def train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, labe
             best_test_epoch = epoch
 
         # output_dir = os.path.join(args.output_dir, TIME_CHECKPOINT_DIR)
-        output_dir = os.path.join(args.output_dir, "joint")
+        output_dir = os.path.join(args.output_dir, "model")
         output_dir = os.path.join(output_dir, f"{PREFIX_CHECKPOINT_DIR}_{epoch}")
-        # os.makedirs(output_dir, exist_ok=True)
-        # torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
+        os.makedirs(output_dir, exist_ok=True)
+        torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
 
     print(" Best dev: epoch=%d, acc=%.4f, f1=%.4f"%(
-        best_dev_epoch, res_list[best_dev-1][0], res_list[best_dev-1][1])
+        best_dev_epoch, res_list[best_dev_epoch-1][0], res_list[best_dev_epoch-1][1])
     )
     print(" Best test: epoch=%d, acc=%.4f, f1=%.4f\n"%(
-        best_test_epoch, res_list[best_test-1][2], res_list[best_test-1][3])
+        best_test_epoch, res_list[best_test_epoch-1][2], res_list[best_test_epoch-1][3])
     )
 
 def evaluate(model, args, dataset, conn_list, label_list, tokenizer, epoch, desc="dev", write_file=False):
@@ -330,6 +330,7 @@ def main():
     label_level = int(args.label_file.split(".")[0].split("_")[-1])
     output_dir = os.path.join(output_dir, "l{}+{}".format(label_level,args.seed))
     os.makedirs(output_dir, exist_ok=True)
+    args.label_level = label_level
     args.output_dir = output_dir
     conn_list, _ = get_connectives_with_threshold(args.data_dir, threshold=args.conn_threshold)
     args.num_labels = len(label_list)
@@ -364,8 +365,12 @@ def main():
         train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        checkpoint_file = "data/result/pdtb2_imp/two_roberta_share_hard/normal/l2/106524"
-        epoch = 9
+        check_dir = os.path.join(args.output_dir, "model")
+        # l1_ji, 5, 8, 9, 5, 9
+        # l2_ji
+        seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
+        epoch = seed_epoch[args.seed]
+        checkpoint_file = os.path.join(check_dir, "checkpoint_{}/pytorch_model.bin".format(epoch))
         print(checkpoint_file)
         args.output_dir = os.path.dirname(checkpoint_file)
         model.load_state_dict(torch.load(checkpoint_file))

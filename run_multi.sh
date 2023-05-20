@@ -31,7 +31,7 @@ sleep 10s
 # For xval, change the dataset to pdtb2 or pdtb3
 # 11
 # <<"COMMENT"
-for idx in 1 2 3 4 5 6 7 8 8 10 11 12
+for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_multi.py --do_train \
                            --dataset="pdtb2" \
@@ -43,7 +43,7 @@ done
 
 sleep 10s
 
-for idx in 1 2 3 4 5 6 7 8 8 10 11 12
+for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_multi.py --do_train \
                            --dataset="pdtb2" \

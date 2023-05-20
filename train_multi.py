@@ -207,10 +207,10 @@ def train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, labe
         torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
 
     print(" Best dev: epoch=%d, acc=%.4f, f1=%.4f" % (
-        best_dev_epoch, res_list[best_dev-1][0], res_list[best_dev-1][1])
+        best_dev_epoch, res_list[best_dev_epoch-1][0], res_list[best_dev_epoch-1][1])
     )
     print(" Best test: epoch=%d, acc=%.4f, f1=%.4f\n" % (
-        best_test_epoch, res_list[best_test-1][2], res_list[best_test-1][3])
+        best_test_epoch, res_list[best_test_epoch-1][2], res_list[best_test_epoch-1][3])
     )
 
 def evaluate(model, args, dataset, conn_list, label_list, tokenizer, epoch, desc="dev", write_file=False):
