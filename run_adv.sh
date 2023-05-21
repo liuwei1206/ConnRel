@@ -61,7 +61,7 @@ do
 done
 COMMENT
 
-for idx in 7 8 10 11 12
+for idx in 11 12
 do
     python3 train_adv.py --do_train \
                          --dataset="pdtb2" \

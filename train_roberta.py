@@ -20,7 +20,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from transformers import RobertaConfig, RobertaTokenizer
-from utils import cal_acc_f1_score_with_ids, labels_from_file
+from utils import cal_acc_f1_score_with_ids, cal_acc_f1_score_per_label, labels_from_file
 from task_dataset import RobertaBaseDataset
 from models import RoBERTaForRelCls
 
@@ -239,6 +239,14 @@ def evaluate(model, args, dataset, label_list, tokenizer, epoch, desc="dev", wri
             all_label_ids = np.append(all_label_ids, label_ids)
             all_predict_ids = np.append(all_predict_ids, pred_ids)
             all_possible_label_ids = np.append(all_possible_label_ids, possible_label_ids, axis=0)
+
+    _ = cal_acc_f1_score_per_label(
+        pred_ids=all_predict_ids,
+        label_ids=all_label_ids,
+        possible_label_ids=all_possible_label_ids,
+        label_list=label_list
+    )
+
     acc, f1 = cal_acc_f1_score_with_ids(
         pred_ids=all_predict_ids,
         label_ids=all_label_ids,
@@ -250,21 +258,23 @@ def evaluate(model, args, dataset, label_list, tokenizer, epoch, desc="dev", wri
         all_input_texts = [
             tokenizer.decode(all_input_ids[i], skip_special_tokens=True) for i in range(len(all_input_ids))
         ]
+        pred_dir = os.path.join(args.data_dir, "preds")
+        os.makedirs(pred_dir, exist_ok=True)
         if args.teacher_forcing:
-            file_name = os.path.join(args.data_dir, "robertaconn+{}_l{}+{}+{}.txt".format(
+            file_name = os.path.join(pred_dir, "robertaconn+{}_l{}+{}+{}.txt".format(
                 desc, args.label_level, epoch, args.seed))
         else:
-            file_name = os.path.join(args.data_dir, "roberta+{}_l{}+{}+{}.txt".format(
+            file_name = os.path.join(pred_dir, "roberta+{}_l{}+{}+{}.txt".format(
                 desc, args.label_level, epoch, args.seed))
         error_num = 0
         with open(file_name, "w", encoding="utf-8") as f:
-            f.write("%-16s %-16s %s\n"%("Label", "Pred", "Text"))
+            f.write("%-16s\t%-16s\t%s\n"%("Label", "Pred", "Text"))
             for label, pred, text in zip(all_labels, all_predictions, all_input_texts):
                 if label == pred:
-                    f.write("%-16s %-16s %s\n"%(label, pred, text))
+                    f.write("%-16s\t%-16s\t%s\n"%(label, pred, text))
                 else:
                     error_num += 1
-                    f.write("%-16s %-16s %s\n" % (label, pred, str(error_num) + " " + text))
+                    f.write("%-16s\t%-16s\t%s\n" % (label, pred, str(error_num) + " " + text))
 
     return acc, f1
 
@@ -345,8 +355,9 @@ def main():
         train(model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        # l1_ji, 5, 8, 9, 5, 9
-        seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
+        # l1_ji, 4, 5, 4, 4, 6
+        # seed_epoch = {106524: 4, 106464: 5, 106537: 4, 219539: 4, 430683: 6}
+        seed_epoch = {106524: 8, 106464: 6, 106537: 10, 219539: 3, 430683: 4}
         epoch = seed_epoch[args.seed]
         checkpoint_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin".format(epoch))
         print(checkpoint_file)

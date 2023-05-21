@@ -417,7 +417,7 @@ class JointConnRel(RobertaPreTrainedModel):
         ## 2 for relation classifiction
         # 2.1 prepare embeddings
         input_word_embeds = self.conn_roberta.roberta.embeddings.word_embeddings(input_ids)
-        # input_word_embeds = torch.scatter(input_word_embeds, dim=1, index=mask_position_index, src=predict_embeds)
+        input_word_embeds = torch.scatter(input_word_embeds, dim=1, index=mask_position_index, src=predict_embeds)
 
         # 2.2 roberta
         rel_outputs = self.conn_roberta.roberta(

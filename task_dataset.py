@@ -295,8 +295,8 @@ class JointRobertaBaseDataset(Dataset):
                     # for encoder input_ids
                     tokens_1 = self.tokenizer.tokenize(arg1)
                     tokens_2 = self.tokenizer.tokenize(arg2)
-                    # tokens = ["<s>"] + tokens_1 + ["<mask>"] + tokens_2
-                    tokens = ["<s>"] + tokens_1 + self.tokenizer.tokenize(connectives) + tokens_2
+                    tokens = ["<s>"] + tokens_1 + ["<mask>"] + tokens_2
+                    # tokens = ["<s>"] + tokens_1 + self.tokenizer.tokenize(connectives) + tokens_2
                     if len(tokens) > self.max_seq_length - 1:
                         tokens = tokens[:self.max_seq_length - 1]
                     tokens = tokens + ["</s>"]
@@ -410,6 +410,7 @@ class MultiTaskDataset(Dataset):
                     tokens_1 = self.tokenizer.tokenize(arg1)
                     tokens_2 = self.tokenizer.tokenize(arg2)
                     tokens = ["<s>"] + tokens_1 + ["</s>", "</s>"] + tokens_2
+                    # tokens = ["<s>"] + tokens_1 + ["</s>", "</s>"] + self.tokenizer.tokenize(connectives) + tokens_2
                     if len(tokens) > self.max_seq_length - 1:
                         tokens = tokens[:self.max_seq_length - 1]
                     tokens = tokens + ["</s>"]
@@ -516,6 +517,7 @@ class AdversarialDataset(Dataset):
                     tokens_1 = self.tokenizer.tokenize(arg1)
                     tokens_2 = self.tokenizer.tokenize(arg2)
                     tokens = ["<s>"] + tokens_1 + ["</s>", "</s>"] + tokens_2
+                    # tokens = ["<s>"] + tokens_1 + ["</s>", "</s>"] + self.tokenizer.tokenize(connectives) + tokens_2 
                     if len(tokens) > self.max_seq_length - 1:
                         tokens = tokens[:self.max_seq_length - 1]
                     tokens = tokens + ["</s>"]

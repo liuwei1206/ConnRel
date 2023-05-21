@@ -20,7 +20,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from transformers import RobertaConfig, RobertaTokenizer
-from utils import cal_acc_f1_score_with_ids, labels_from_file
+from utils import cal_acc_f1_score_with_ids, cal_acc_f1_score_per_label, labels_from_file
 from task_dataset import AdversarialDataset
 from models import AdversarialModelForRelCls
 
@@ -428,6 +428,14 @@ def joint_evaluate(model, args, dataset, label_list, tokenizer, epoch, desc="dev
             all_label_ids = np.append(all_label_ids, label_ids)
             all_predict_ids = np.append(all_predict_ids, pred_ids)
             all_possible_label_ids = np.append(all_possible_label_ids, possible_label_ids, axis=0)
+    """
+    _ = cal_acc_f1_score_per_label(
+        pred_ids=all_predict_ids,
+        label_ids=all_label_ids,
+        possible_label_ids=all_possible_label_ids,
+        label_list=label_list
+    )
+    """
 
     acc, f1 = cal_acc_f1_score_with_ids(
         pred_ids=all_predict_ids,
@@ -440,17 +448,19 @@ def joint_evaluate(model, args, dataset, label_list, tokenizer, epoch, desc="dev
         all_input_texts = [
             tokenizer.decode(all_input_ids[i], skip_special_tokens=True) for i in range(len(all_input_ids))
         ]
-        file_name = os.path.join(args.data_dir, "adv+{}_l{}+{}+{}.txt".format(
+        pred_dir = os.path.join(args.data_dir, "preds")
+        os.makedirs(pred_dir, exist_ok=True)
+        file_name = os.path.join(pred_dir, "adv+{}_l{}+{}+{}.txt".format(
             desc, args.label_level, epoch, args.seed))
         error_num = 0
         with open(file_name, "w", encoding="utf-8") as f:
-            f.write("%-16s %-16s %s\n" % ("Label", "Pred", "Text"))
+            f.write("%-16s\t%-16s\t%s\n" % ("Label", "Pred", "Text"))
             for label, pred, text in zip(all_labels, all_predictions, all_input_texts):
                 if label == pred:
-                    f.write("%-16s %-16s %s\n" % (label, pred, text))
+                    f.write("%-16s\t%-16s\t%s\n" % (label, pred, text))
                 else:
                     error_num += 1
-                    f.write("%-16s %-16s %s\n" % (label, pred, str(error_num) + " " + text))
+                    f.write("%-16s\t%-16s\t%s\n" % (label, pred, str(error_num) + " " + text))
 
     return acc, f1
 

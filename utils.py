@@ -4,7 +4,7 @@
 import os
 import json
 import numpy as np
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, classification_report
 import torch
 import math
 import random
@@ -37,6 +37,30 @@ def cal_acc_f1_score_with_ids(pred_ids, label_ids, possible_label_ids):
 
     # return acc, p, r, f1
     return acc, f1
+
+def cal_acc_f1_score_per_label(pred_ids, label_ids, possible_label_ids, label_list):
+    """
+    sample_size: N
+    label_size: V
+    Args:
+        pred_ids: [N]
+        label_ids: [N]
+        possible_label_ids: [N, V]
+    note, each sample in implicit discourse may have more than one label
+    if the predicted label match one of those labels, then the prediction is considered
+    as true
+    """
+    extend_label_ids = []
+    for idx, p in enumerate(pred_ids):
+        if possible_label_ids[idx, p] == 1:
+            extend_label_ids.append(p)
+        else:
+            extend_label_ids.append(label_ids[idx])
+    label_ids = np.array(extend_label_ids)
+    res = classification_report(y_true=label_ids, y_pred=pred_ids, target_names=label_list, digits=4)
+    print(res)
+
+    return res
 
 def count_frequency_in_files(file_names, rel_type="implicit", item_name="args1"):
     """

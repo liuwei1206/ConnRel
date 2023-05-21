@@ -20,7 +20,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from transformers import RobertaConfig, RobertaTokenizer
-from utils import cal_acc_f1_score_with_ids, get_connectives_with_threshold, get_onehot_conn_from_vocab
+from utils import cal_acc_f1_score_with_ids, cal_acc_f1_score_per_label, get_connectives_with_threshold, get_onehot_conn_from_vocab
 from utils import split_train_for_pipeline_conn, merge_pred_conn_to_file, labels_from_file
 
 from task_dataset import ConnRobertaBaseDataset, RobertaBaseDataset
@@ -381,7 +381,14 @@ def evaluate_rel(model, args, dataset, label_list, tokenizer, epoch, desc="dev",
             all_label_ids = np.append(all_label_ids, label_ids)
             all_predict_ids = np.append(all_predict_ids, pred_ids)
             all_possible_label_ids = np.append(all_possible_label_ids, possible_label_ids, axis=0)
-
+    """
+    _ = cal_acc_f1_score_per_label(
+        pred_ids=all_predict_ids,
+        label_ids=all_label_ids,
+        possible_label_ids=all_possible_label_ids,
+        label_list=label_list
+    )
+    """
     acc, f1 = cal_acc_f1_score_with_ids(
         pred_ids=all_predict_ids,
         label_ids=all_label_ids,
@@ -393,17 +400,19 @@ def evaluate_rel(model, args, dataset, label_list, tokenizer, epoch, desc="dev",
         all_input_texts = [
             tokenizer.decode(all_input_ids[i], skip_special_tokens=True) for i in range(len(all_input_ids))
         ]
-        file_name = os.path.join(args.data_dir, "pipe+{}_l{}+{}+{}.txt".format(
+        pred_dir = os.path.join(args.data_dir, "preds")
+        os.makedirs(pred_dir, exist_ok=True)
+        file_name = os.path.join(pred_dir, "pipe+{}_l{}+{}+{}.txt".format(
             desc, args.label_level, epoch, args.seed))
         error_num = 0
         with open(file_name, "w", encoding="utf-8") as f:
-            f.write("%-16s %-16s %s\n"%("Label", "Pred", "Text"))
+            f.write("%-16s\t%-16s\t%s\n"%("Label", "Pred", "Text"))
             for label, pred, text in zip(all_labels, all_predictions, all_input_texts):
                 if label == pred:
-                    f.write("%-16s %-16s %s\n"%(label, pred, text))
+                    f.write("%-16s\t%-16s\t%s\n"%(label, pred, text))
                 else:
                     error_num += 1
-                    f.write("%-16s %-16s %s\n" % (label, pred, str(error_num) + " " + text))
+                    f.write("%-16s\t%-16s\t%s\n" % (label, pred, str(error_num) + " " + text))
 
     return acc, f1
 
@@ -558,6 +567,7 @@ def main():
         "label_level": label_level,
         "use_conn": args.use_conn,
         "conn_type": "predict"
+        # "conn_type": "ground"
     }
 
     if args.do_train:
@@ -567,16 +577,16 @@ def main():
         train_rel(rel_model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        """
-        # l1_ji, 5, 8, 9, 5, 9
-        seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
+        # """
+        # l1_ji, 7, 6, 5, 6, 4
+        seed_epoch = {106524: 7, 106464: 6, 106537: 5, 219539: 6, 430683: 4}
         epoch = seed_epoch[args.seed]
-        checkpoint_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin".format(epoch))
+        checkpoint_file = os.path.join(args.output_dir, "l{}+{}/model/checkpoint_{}/pytorch_model.bin".format(args.label_level, args.seed, epoch))
         print(checkpoint_file)
         rel_model.load_state_dict(torch.load(checkpoint_file))
         rel_model.eval()
 
-        # dataset = RobertaBaseDataset(train_data_file, params=dataset_params)
+        # dataset = RobertaBaseDataset(train_rel_conn_file, params=dataset_params)
         # acc, f1 = evaluate_rel(
         #     rel_model, args, dataset, label_list, tokenizer,
         #     epoch, desc="train", write_file=True
@@ -584,27 +594,28 @@ def main():
         # print(" Train: acc=%.4f, f1=%.4f\n" % (acc, f1))
 
         if args.do_dev:
-            dataset = RobertaBaseDataset(dev_data_file, params=dataset_params)
+            dataset = RobertaBaseDataset(dev_conn_rel_file, params=dataset_params)
             acc, f1 = evaluate_rel(
                 rel_model, args, dataset, label_list, tokenizer,
                 epoch, desc="dev", write_file=False)
             print("Dev: acc=%.4f, f1=%.4f\n" % (acc, f1))
         if args.do_test:
-            dataset = RobertaBaseDataset(test_data_file, params=dataset_params)
+            dataset = RobertaBaseDataset(test_conn_rel_file, params=dataset_params)
             acc, f1 = evaluate_rel(
                 rel_model, args, dataset, label_list, tokenizer,
                 epoch, desc="test", write_file=False
             )
             print("Test: acc=%.4f, f1=%.4f\n" % (acc, f1))
+        # """
         """
-        # dev_dataset = RobertaBaseDataset(dev_data_file, params=dataset_params)
-        test_dataset = RobertaBaseDataset(test_data_file, params=dataset_params)
+        # dev_dataset = RobertaBaseDataset(dev_conn_rel_file, params=dataset_params)
+        test_dataset = RobertaBaseDataset(test_conn_rel_file, params=dataset_params)
         temp_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
         for epoch in range(3, 11):
             checkpoint_file = temp_file.format(epoch)
             print(" Epoch %d, %s" % (epoch, checkpoint_file))
-            model.load_state_dict(torch.load(checkpoint_file))
-            model.eval()
+            rel_model.load_state_dict(torch.load(checkpoint_file))
+            rel_model.eval()
 
             # acc, f1 = evaluate_rel(
             #     rel_model, args, dev_dataset, label_list, tokenizer,
@@ -617,6 +628,7 @@ def main():
             )
             print(" Test: acc=%.4f, f1=%.4f" % (acc, f1))
             print()
+        """
 
 if __name__ == "__main__":
     main()

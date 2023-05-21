@@ -20,7 +20,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from transformers import RobertaConfig, RobertaTokenizer
-from utils import cal_acc_f1_score_with_ids, get_connectives_with_threshold, get_onehot_conn_from_vocab, labels_from_file
+from utils import cal_acc_f1_score_with_ids, cal_acc_f1_score_per_label, get_connectives_with_threshold, get_onehot_conn_from_vocab, labels_from_file
 from task_dataset import JointRobertaBaseDataset
 from models import JointConnRel
 
@@ -265,6 +265,13 @@ def evaluate(model, args, dataset, conn_list, label_list, tokenizer, epoch, desc
             all_predict_ids = np.append(all_predict_ids, pred_ids)
 
     conn_acc = np.sum(all_conn_ids == all_pred_conn_ids) / all_conn_ids.shape[0]
+    _ = cal_acc_f1_score_per_label(
+        pred_ids=all_predict_ids,
+        label_ids=all_label_ids,
+        possible_label_ids=all_possible_label_ids,
+        label_list=label_list
+    )
+
     acc, f1 = cal_acc_f1_score_with_ids(
         pred_ids=all_predict_ids,
         label_ids=all_label_ids,
@@ -279,20 +286,21 @@ def evaluate(model, args, dataset, conn_list, label_list, tokenizer, epoch, desc
         all_input_texts = [
             tokenizer.decode(all_input_ids[i], skip_special_tokens=True) for i in range(len(all_input_ids))
         ]
-
-        file_name = os.path.join(args.data_dir, "joint+{}_l{}+{}+{}.txt".format(
+        pred_dir = os.path.join(args.data_dir, "preds")
+        os.makedirs(pred_dir, exist_ok=True)
+        file_name = os.path.join(pred_dir, "joint+{}_l{}+{}+{}.txt".format(
             desc, args.label_level, epoch, args.seed))
         error_num = 0
         with open(file_name, "w", encoding="utf-8") as f:
-            f.write("%-16s %-16s %-16s %-16s %s\n" % ("Conn", "Pred_conn", "Label", "Pred", "Text"))
+            f.write("%-16s\t%-16s\t%-16s\t%-16s\t%s\n" % ("Conn", "Pred_conn", "Label", "Pred", "Text"))
             for conn, pred_conn, label, pred, text in zip(
                     all_conns, all_pred_conns, all_labels, all_predictions, all_input_texts
             ):
                 if label == pred:
-                    f.write("%-16s %-16s %-16s %-16s %s\n" % (conn, pred_conn, label, pred, text))
+                    f.write("%-16s\t%-16s\t%-16s\t%-16s\t%s\n" % (conn, pred_conn, label, pred, text))
                 else:
                     error_num += 1
-                    f.write("%-16s %-16s %-16s %-16s %s\n" % (conn, pred_conn, label, pred, str(error_num) + " " + text))
+                    f.write("%-16s\t%-16s\t%-16s\t%-16s\t%s\n" % (conn, pred_conn, label, pred, str(error_num) + " " + text))
 
     return conn_acc, acc, f1
 
@@ -365,7 +373,7 @@ def main():
         train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        """
+        # """
         # l1_ji, 5, 8, 9, 5, 9
         seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
         epoch = seed_epoch[args.seed]
@@ -378,9 +386,9 @@ def main():
         # conn_acc, acc, f1 = evaluate(
         #     model, args, dataset, conn_list, label_list, tokenizer, 
         #     epoch, desc="train", write_file=False
-        # )
+        # ) 
+        # print("Train: conn_acc=%.4f, acc=%.4f, f1=%.4f\n"%(conn_acc, acc, f1))
         
-        print("Train: conn_acc=%.4f, acc=%.4f, f1=%.4f\n"%(conn_acc, acc, f1))
         if args.do_dev:
             dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
             conn_acc, acc, f1 = evaluate(
@@ -395,6 +403,7 @@ def main():
                 epoch, desc="test", write_file=False
             )
             print("Test: conn_acc=%.4f, acc=%.4f, f1=%.4f\n" % (conn_acc, acc, f1))
+        # """
         """
         # dev_dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
         test_dataset = JointRobertaBaseDataset(test_data_file, params=dataset_params)
@@ -416,6 +425,7 @@ def main():
             )
             print(" Test: conn_acc=%.4f, acc=%.4f, f1=%.4f" % (conn_acc, acc, f1))
             print()
+        """
 
 if __name__ == "__main__":
     main()
