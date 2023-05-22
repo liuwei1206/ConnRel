@@ -259,14 +259,14 @@ def evaluate(model, args, dataset, conn_list, label_list, tokenizer, epoch, desc
             all_predict_ids = np.append(all_predict_ids, pred_ids)
 
     conn_acc = np.sum(all_conn_ids == all_pred_conn_ids) / all_conn_ids.shape[0]
-    # """
+    """
     _ = cal_acc_f1_score_per_label(
         pred_ids=all_predict_ids,
         label_ids=all_label_ids,
         possible_label_ids=all_possible_label_ids,
         label_list=label_list
     )
-    # """
+    """
     acc, f1 = cal_acc_f1_score_with_ids(
         pred_ids=all_predict_ids,
         label_ids=all_label_ids,
@@ -380,7 +380,7 @@ def main():
             dataset = MultiTaskDataset(dev_data_file, params=dataset_params)
             conn_acc, acc, f1 = evaluate(
                 model, args, dataset, conn_list, label_list, tokenizer,
-                epoch, desc="dev", write_file=True
+                epoch, desc="dev", write_file=False
             )
             print(" Dev: conn_acc=%.4f, acc=%.4f, f1=%.4f\n" % (conn_acc, acc, f1))
 
@@ -388,7 +388,7 @@ def main():
                 dataset = MultiTaskDataset(test_data_file, params=dataset_params)
                 conn_acc, acc, f1 = evaluate(
                     model, args, dataset, conn_list, label_list, tokenizer,
-                    epoch, desc="test", write_file=True
+                    epoch, desc="test", write_file=False
                 )
                 print(" Test: conn_acc=%.4f, acc=%.4f, f1=%.4f\n" % (conn_acc, acc, f1))
         # """

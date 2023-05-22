@@ -7,7 +7,7 @@ python3 train_pipeline.py --do_train \
 COMMENT
 # 8
 
-<<"COMMENT"
+# <<"COMMENT"
 for seed in 106524 106464 106537 219539 430683
 do
     python3 train_pipeline.py --do_train \
@@ -16,11 +16,11 @@ do
                               --seed=${seed} \
                               --use_conn
 done
-COMMNET
+# COMMNET
 
 sleep 10s
 
-<<"COMMENT"
+# <<"COMMENT"
 for seed in 106524 106464 106537 219539 430683
 do
     python3 train_pipeline.py --do_train \
@@ -29,15 +29,13 @@ do
                               --seed=${seed} \
                               --use_conn
 done
-COMMENT
+# COMMENT
 
 sleep 10s
 
 # For xval, change the dataset to pdtb2 or pdtb3
-# 11
 # <<"COMMENT"
-# for idx in 1 2 3 4 5 6 7 8 10 11 12
-for idx in 6 7 8 10 11 12
+for idx in 1 2 3 4 5 6 7 8 10 11 12
 do
     python3 train_pipeline.py --do_train \
                               --dataset="pdtb2" \
@@ -46,10 +44,10 @@ do
                               --use_conn
 done
 # COMMENT
-# 21
 
 sleep 10s
 
+# <<"COMMENT"
 for idx in 1 2 3 4 5 6 7 8 10 11 12
 do
     python3 train_pipeline.py --do_train \
@@ -58,4 +56,4 @@ do
                               --label_file="labels_level_2.txt" \
                               --use_conn
 done
-
+# COMMENT

@@ -555,7 +555,7 @@ def main():
         joint_train(model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        """
+        # """
         # l1_ji, 9, 5, 10, 10, 10
         seed_epoch = {106524: 9, 106464: 5, 106537: 10, 219539: 10, 430683: 10}
         epoch = seed_epoch[args.seed]
@@ -567,15 +567,16 @@ def main():
         if args.do_dev:
             dataset = AdversarialDataset(dev_data_file, params=dataset_params)
             acc, f1 = joint_evaluate(
-                model, args, dataset, label_list, tokenizer, epoch, desc="dev", write_file=True
+                model, args, dataset, label_list, tokenizer, epoch, desc="dev", write_file=False
             )
             print(" Dev: acc=%.4f, f1=%.4f\n"%(acc, f1))
         if args.do_test:
             dataset = AdversarialDataset(test_data_file, params=dataset_params)
             acc, f1 = joint_evaluate(
-                model, args, dataset, label_list, tokenizer, epoch, desc="test", write_file=True
+                model, args, dataset, label_list, tokenizer, epoch, desc="test", write_file=False
             )
             print(" Test: acc=%.4f, f1=%.4f\n"%(acc, f1))
+        # """
         """
         # dev_dataset = AdversarialDataset(dev_data_file, params=dataset_params)
         test_dataset = AdversarialDataset(test_data_file, params=dataset_params)
@@ -596,6 +597,7 @@ def main():
             )
             print(" Test: acc=%.4f, f1=%.4f" % (acc, f1))
             print()
+        """
 
 if __name__ == "__main__":
     main()

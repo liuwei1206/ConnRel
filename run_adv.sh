@@ -8,7 +8,7 @@ COMMENT
 # 8
 
 # 10
-<<"COMMENT"
+# <<"COMMENT"
 for seed in 106524 106464 106537 219539 430683
 do
     python3 train_adv.py --do_train \
@@ -16,13 +16,13 @@ do
                          --label_file="labels_level_1.txt" \
                          --seed=${seed}
 done
-COMMENT
+# COMMENT
 # 20
 
 sleep 10s
 
 # 24
-<<"COMMENT"
+# <<"COMMENT"
 for seed in 106524 106464 106537 219539 430683
 do
     python3 train_adv.py --do_train \
@@ -30,14 +30,14 @@ do
                          --label_file="labels_level_2.txt" \
                          --seed=${seed}
 done
-COMMENT
+# COMMENT
 # 34
 
 sleep 10s
 
 # For xval, change the dataset to pdtb2 or pdtb3
 # 39
-<<"COMMENT"
+# <<"COMMENT"
 for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_adv.py --do_train \
@@ -45,13 +45,13 @@ do
                          --fold_id=${idx} \
                          --label_file="labels_level_1.txt"
 done
-COMMENT
+# COMMENT
 # 49
 
 sleep 10s
 
 # 53
-<<"COMMENT"
+# <<"COMMENT"
 for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_adv.py --do_train \
@@ -59,13 +59,5 @@ do
                          --fold_id=${idx} \
                          --label_file="labels_level_2.txt"
 done
-COMMENT
-
-for idx in 11 12
-do
-    python3 train_adv.py --do_train \
-                         --dataset="pdtb2" \
-                         --fold_id=${idx} \
-                         --label_file="labels_level_2.txt"
-done
+# COMMENT
 

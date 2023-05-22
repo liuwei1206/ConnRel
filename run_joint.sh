@@ -1,15 +1,15 @@
 # For Ji split, change the dataset to pdtb2 or pdtb3
 # 2
-# <<"COMMENT"
+<<"COMMENT"
 python3 train_joint_conn_rel.py --do_train \
                                 --dataset="other2" \
                                 --label_file="labels_level_1.txt" \
                                 --sample_k=100
-# COMMENT
+COMMENT
 # 9
 
 # 11
-<<"COMMENT"
+# <<"COMMENT"
 for seed in 106524 106464 106537 219539 430683
 do
     python3 train_joint_conn_rel.py --do_train \
@@ -18,13 +18,13 @@ do
                                     --sample_k=100 \
                                     --seed=${seed}
 done
-COMMENT
+# COMMENT
 # 22
 
 sleep 10s
 
 # 26
-<<"COMMENT"
+# <<"COMMENT"
 for seed in 106524 106464 106537 219539 430683
 do
     python3 train_joint_conn_rel.py --do_train \
@@ -33,14 +33,14 @@ do
                                     --sample_k=100 \
                                     --seed=${seed}
 done
-COMMENT
+# COMMENT
 # 37
 
 sleep 10s
 
 # For xval, change the dataset to pdtb2 or pdtb3
 # 42
-<<"COMMENT"
+# <<"COMMENT"
 for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_joint_conn_rel.py --do_train \
@@ -49,13 +49,13 @@ do
                                     --label_file="labels_level_1.txt" \
                                     --sample_k=100
 done
-COMMENT
+# COMMENT
 # 53
 
 sleep 10s
 
 # 57
-<<"COMMENT"
+# <<"COMMENT"
 for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do
     python3 train_joint_conn_rel.py --do_train \
@@ -64,5 +64,5 @@ do
                                     --label_file="labels_level_2.txt" \
                                     --sample_k=100
 done
-COMMENT
+# COMMENT
 # 68

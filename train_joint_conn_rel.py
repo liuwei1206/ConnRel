@@ -208,8 +208,8 @@ def train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, labe
         # output_dir = os.path.join(args.output_dir, TIME_CHECKPOINT_DIR)
         output_dir = os.path.join(args.output_dir, "model")
         output_dir = os.path.join(output_dir, f"{PREFIX_CHECKPOINT_DIR}_{epoch}")
-        os.makedirs(output_dir, exist_ok=True)
-        torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
+        # os.makedirs(output_dir, exist_ok=True)
+        # torch.save(model.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
 
     print(" Best dev: epoch=%d, acc=%.4f, f1=%.4f"%(
         best_dev_epoch, res_list[best_dev_epoch-1][0], res_list[best_dev_epoch-1][1])
@@ -265,13 +265,14 @@ def evaluate(model, args, dataset, conn_list, label_list, tokenizer, epoch, desc
             all_predict_ids = np.append(all_predict_ids, pred_ids)
 
     conn_acc = np.sum(all_conn_ids == all_pred_conn_ids) / all_conn_ids.shape[0]
+    """
     _ = cal_acc_f1_score_per_label(
         pred_ids=all_predict_ids,
         label_ids=all_label_ids,
         possible_label_ids=all_possible_label_ids,
         label_list=label_list
     )
-
+    """
     acc, f1 = cal_acc_f1_score_with_ids(
         pred_ids=all_predict_ids,
         label_ids=all_label_ids,
