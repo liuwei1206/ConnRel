@@ -577,7 +577,6 @@ def main():
         train_rel(rel_model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        # """
         # l1_ji, 7, 6, 5, 6, 4
         seed_epoch = {106524: 7, 106464: 6, 106537: 5, 219539: 6, 430683: 4}
         epoch = seed_epoch[args.seed]
@@ -585,13 +584,6 @@ def main():
         print(checkpoint_file)
         rel_model.load_state_dict(torch.load(checkpoint_file))
         rel_model.eval()
-
-        # dataset = RobertaBaseDataset(train_rel_conn_file, params=dataset_params)
-        # acc, f1 = evaluate_rel(
-        #     rel_model, args, dataset, label_list, tokenizer,
-        #     epoch, desc="train", write_file=True
-        # )
-        # print(" Train: acc=%.4f, f1=%.4f\n" % (acc, f1))
 
         if args.do_dev:
             dataset = RobertaBaseDataset(dev_conn_rel_file, params=dataset_params)
@@ -606,29 +598,6 @@ def main():
                 epoch, desc="test", write_file=False
             )
             print("Test: acc=%.4f, f1=%.4f\n" % (acc, f1))
-        # """
-        """
-        # dev_dataset = RobertaBaseDataset(dev_conn_rel_file, params=dataset_params)
-        test_dataset = RobertaBaseDataset(test_conn_rel_file, params=dataset_params)
-        temp_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
-        for epoch in range(3, 11):
-            checkpoint_file = temp_file.format(epoch)
-            print(" Epoch %d, %s" % (epoch, checkpoint_file))
-            rel_model.load_state_dict(torch.load(checkpoint_file))
-            rel_model.eval()
-
-            # acc, f1 = evaluate_rel(
-            #     rel_model, args, dev_dataset, label_list, tokenizer,
-            #     epoch, desc="dev", write_file=False
-            # )
-            # print(" Dev: acc=%.4f, f1=%.4f" % (acc, f1))
-            acc, f1 = evaluate_rel(
-                rel_model, args, test_dataset, label_list, tokenizer,
-                epoch, desc="test", write_file=False
-            )
-            print(" Test: acc=%.4f, f1=%.4f" % (acc, f1))
-            print()
-        """
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,4 @@
-# For Ji split, change the dataset to pdtb2 or pdtb3
+### 1. For Ji split, change the dataset to pdtb2 or pdtb3
 # 2
 <<"COMMENT"
 python3 train_roberta.py --do_train \
@@ -41,8 +41,8 @@ done
 
 sleep 10s
 
-# For xval, change the dataset to pdtb2 or pdtb3
-# 15
+### 2. For xval, change the dataset to pdtb2 or pdtb3
+# 45
 # <<"COMMENT"
 for idx in 1 2 3 4 5 6 7 8 9 10 11 12
 do

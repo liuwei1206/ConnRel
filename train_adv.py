@@ -555,7 +555,6 @@ def main():
         joint_train(model, args, train_dataset, dev_dataset, test_dataset, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        # """
         # l1_ji, 9, 5, 10, 10, 10
         seed_epoch = {106524: 9, 106464: 5, 106537: 10, 219539: 10, 430683: 10}
         epoch = seed_epoch[args.seed]
@@ -576,28 +575,6 @@ def main():
                 model, args, dataset, label_list, tokenizer, epoch, desc="test", write_file=False
             )
             print(" Test: acc=%.4f, f1=%.4f\n"%(acc, f1))
-        # """
-        """
-        # dev_dataset = AdversarialDataset(dev_data_file, params=dataset_params)
-        test_dataset = AdversarialDataset(test_data_file, params=dataset_params)
-        join = os.path.join(args.output_dir, "joint_train/model/checkpoint_{}/pytorch_model.bin")
-        temp_file = join
-        for epoch in range(3, 11):
-            checkpoint_file = temp_file.format(epoch)
-            print(" Epoch %d, %s"%(epoch, checkpoint_file))
-            model.load_state_dict(torch.load(checkpoint_file))
-            model.eval()
-
-            # acc, f1 = joint_evaluate(
-            #     model, args, dev_dataset, label_list, tokenizer, epoch, desc="dev", write_file=True
-            # )
-            # print(" Dev: acc=%.4f, f1=%.4f" % (acc, f1))
-            acc, f1 = joint_evaluate(
-                model, args, test_dataset, label_list, tokenizer, epoch, desc="test", write_file=True
-            )
-            print(" Test: acc=%.4f, f1=%.4f" % (acc, f1))
-            print()
-        """
 
 if __name__ == "__main__":
     main()

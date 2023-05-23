@@ -374,7 +374,6 @@ def main():
         train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        # """
         # l1_ji, 5, 8, 9, 5, 9
         seed_epoch = {106524: 5, 106464: 8, 106537: 9, 219539: 5, 430683: 7}
         epoch = seed_epoch[args.seed]
@@ -382,13 +381,6 @@ def main():
         print(checkpoint_file)
         model.load_state_dict(torch.load(checkpoint_file))
         model.eval()
-        
-        # dataset = JointRobertaBaseDataset(train_data_file, params=dataset_params)
-        # conn_acc, acc, f1 = evaluate(
-        #     model, args, dataset, conn_list, label_list, tokenizer, 
-        #     epoch, desc="train", write_file=False
-        # ) 
-        # print("Train: conn_acc=%.4f, acc=%.4f, f1=%.4f\n"%(conn_acc, acc, f1))
         
         if args.do_dev:
             dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
@@ -404,29 +396,6 @@ def main():
                 epoch, desc="test", write_file=False
             )
             print("Test: conn_acc=%.4f, acc=%.4f, f1=%.4f\n" % (conn_acc, acc, f1))
-        # """
-        """
-        # dev_dataset = JointRobertaBaseDataset(dev_data_file, params=dataset_params)
-        test_dataset = JointRobertaBaseDataset(test_data_file, params=dataset_params)
-        temp_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
-        for epoch in range(3, 11):
-            checkpoint_file = temp_file.format(epoch)
-            print(" Epoch %d, %s"%(epoch, checkpoint_file))
-            model.load_state_dict(torch.load(checkpoint_file))
-            model.eval()
-
-            # conn_acc, acc, f1 = evaluate(
-            #     model, args, dev_dataset, conn_list, label_list, tokenizer,
-            #     epoch, desc="dev", write_file=False
-            # )
-            # print(" Dev: conn_acc=%.4f, acc=%.4f, f1=%.4f" % (conn_acc, acc, f1))
-            conn_acc, acc, f1 = evaluate(
-                model, args, test_dataset, conn_list, label_list, tokenizer,
-                epoch, desc="test", write_file=False
-            )
-            print(" Test: conn_acc=%.4f, acc=%.4f, f1=%.4f" % (conn_acc, acc, f1))
-            print()
-        """
 
 if __name__ == "__main__":
     main()

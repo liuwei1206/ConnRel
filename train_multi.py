@@ -366,7 +366,6 @@ def main():
         train(model, args, train_dataset, dev_dataset, test_dataset, conn_list, label_list, tokenizer)
 
     if args.do_dev or args.do_test:
-        # """
         # l1_ji, 5, 9, 7, 7, 8
         seed_epoch = {106524: 5, 106464: 9, 106537: 7, 219539: 7, 430683: 8}
         epoch = seed_epoch[args.seed]
@@ -391,29 +390,6 @@ def main():
                     epoch, desc="test", write_file=False
                 )
                 print(" Test: conn_acc=%.4f, acc=%.4f, f1=%.4f\n" % (conn_acc, acc, f1))
-        # """
-        """
-        # dev_dataset = MultiTaskDataset(dev_data_file, params=dataset_params)
-        test_dataset = MultiTaskDataset(test_data_file, params=dataset_params)
-        temp_file = os.path.join(args.output_dir, "model/checkpoint_{}/pytorch_model.bin")
-        for epoch in range(5, 9):
-            checkpoint_file = temp_file.format(epoch)
-            print(" Epoch %d, %s" % (epoch, checkpoint_file))
-            model.load_state_dict(torch.load(checkpoint_file))
-            model.eval()
-
-            # conn_acc, acc, f1 = evaluate(
-            #     model, args, dev_dataset, conn_list, label_list, tokenizer,
-            #     epoch, desc="dev", write_file=False
-            # )
-            # print(" Dev: conn_acc=%.4f, acc=%.4f, f1=%.4f" % (conn_acc, acc, f1))
-            conn_acc, acc, f1 = evaluate(
-                model, args, test_dataset, conn_list, label_list, tokenizer,
-                epoch, desc="test", write_file=False
-            )
-            print(" Test: conn_acc=%.4f, acc=%.4f, f1=%.4f" % (conn_acc, acc, f1))
-            print()
-        """
 
 if __name__ == "__main__":
     main()

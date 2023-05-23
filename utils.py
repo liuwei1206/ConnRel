@@ -31,11 +31,8 @@ def cal_acc_f1_score_with_ids(pred_ids, label_ids, possible_label_ids):
             extend_label_ids.append(label_ids[idx])
     label_ids = np.array(extend_label_ids)
     acc = accuracy_score(y_true=label_ids, y_pred=pred_ids)
-    # p = precision_score(y_true=label_ids, y_pred=pred_ids, average="macro")
-    # r = recall_score(y_true=label_ids, y_pred=pred_ids, average="macro")
     f1 = f1_score(y_true=label_ids, y_pred=pred_ids, average="macro")
 
-    # return acc, p, r, f1
     return acc, f1
 
 def cal_acc_f1_score_per_label(pred_ids, label_ids, possible_label_ids, label_list):
