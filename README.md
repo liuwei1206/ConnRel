@@ -28,7 +28,7 @@ Then you need to download roberta-base from [here](https://huggingface.co/robert
 
 **For PDTB 3.0**, you need to change (set) the dataset parameter in script to "pdtb3". Note that, in order to reproduce our results, you also need to modify the `sample_k` to 200. For more details, please refer to the paper.
 
-**For PCC**, you need to change the dataset into "pcc" and modify the "sample_k" to 10 and "conn_threshold" to 5.
+**For PCC**, you need to change the dataset into "pcc" and modify the `sample_k` to 10 and `conn_threshold` to 5.
 
 ## 4. Citation
 You can cite our paper through:
