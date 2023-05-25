@@ -4,6 +4,7 @@
 import json
 import os
 import re
+import csv
 
 def getConnLabel(text_array, is_altlex=False):
     array_size = len(text_array)
@@ -274,6 +275,71 @@ def refine_raw_data_pdtb3(source_dir, gold_dir, data_list, output_dir, mode):
         for sample in all_samples:
             f.write("%s\n" % (json.dumps(sample, ensure_ascii=False)))
 
+def refine_raw_data_pcc(source_dir, output_dir):
+    file_path = os.path.join(source_dir, "pcc_discourse_relations_all.tsv")
+    csv_reader = csv.reader(open(file_path), delimiter="\t", quotechar='"')
+    all_samples = []
+    cur_line = 0
+    for line in csv_reader:
+        cur_line += 1
+        if cur_line == 1:
+            continue
+        sample = {}
+        sample["relation_type"] = line[3]
+        sample["relation_class"] = line[2]
+        sample["conn"] = line[4]
+        sample["arg1"] = line[5]
+        sample["arg2"] = line[6]
+        all_samples.append(json.dumps(sample, ensure_ascii=False))
+
+    random.shuffle(all_samples)
+    total_num = len(all_samples)
+    print(total_num)
+    piece_num = int(total_num * 0.2)
+    p1_samples = all_samples[:piece_num]
+    p2_samples = all_samples[piece_num:piece_num * 2]
+    p3_samples = all_samples[piece_num * 2:piece_num * 3]
+    p4_samples = all_samples[piece_num * 3:piece_num * 4]
+    p5_samples = all_samples[piece_num * 4:]
+    all_pieces = [p1_samples, p2_samples, p3_samples, p4_samples, p5_samples]
+
+    fold_group = [[0, 1, 2, 3, 4], [1, 2, 3, 4, 0], [2, 3, 4, 0, 1], [3, 4, 0, 1, 2], [4, 0, 1, 2, 3]]
+
+    for fold_id in range(5):
+        train_samples = []
+        dev_samples = []
+        test_samples = []
+
+        train_samples.extend(all_pieces[fold_group[fold_id][0]])
+        train_samples.extend(all_pieces[fold_group[fold_id][1]])
+        train_samples.extend(all_pieces[fold_group[fold_id][2]])
+        dev_samples.extend(all_pieces[fold_group[fold_id][3]])
+        test_samples.extend(all_pieces[fold_group[fold_id][4]])
+        print("Train size: %d, Dev size: %d, Test size: %d" % (len(train_samples), len(dev_samples), len(test_samples)))
+
+        fold_dir = os.path.join(output_dir, "{}".format(fold_id+1))
+        os.makedirs(fold_dir, exist_ok=True)
+        train_file = os.path.join(fold_dir, "train.json")
+        dev_file = os.path.join(fold_dir, "dev.json")
+        test_file = os.path.join(fold_dir, "test.json")
+        with open(train_file, "w", encoding="utf-8") as f:
+            random.shuffle(train_samples)
+            for text in train_samples:
+                f.write("%s\n" % (text))
+
+        with open(dev_file, "w", encoding="utf-8") as f:
+            random.shuffle(dev_samples)
+            for text in dev_samples:
+                f.write("%s\n" % (text))
+
+        with open(test_file, "w", encoding="utf-8") as f:
+            random.shuffle(test_samples)
+            for text in test_samples:
+                f.write("%s\n" % (text))
+
+        generate_label_file(fold_dir)
+
+
 def write_labels_to_file(file_path, label_list):
     with open(file_path, "w", encoding="utf-8") as f:
         for label in label_list:
@@ -285,13 +351,19 @@ def generate_label_file(data_dir):
         label1_list = ["Comparison", "Contingency", "Expansion", "Temporal"]
         label2_file = os.path.join(data_dir, "labels_level_2.txt")
         label2_list = ['Asynchronous', 'Synchrony', 'Cause', 'Pragmatic Cause', 'Contrast', 'Concession', 'Conjunction', 'Instantiation', 'Restatement', 'Alternative', 'List']
+        write_labels_to_file(label1_file, label1_list)
+        write_labels_to_file(label2_file, label2_list)
     elif "pdtb3" in data_dir:
         label1_file = os.path.join(data_dir, "labels_level_1.txt")
         label1_list = ["Comparison", "Contingency", "Expansion", "Temporal"]
         label2_file = os.path.join(data_dir, "labels_level_2.txt")
         label2_list = ['Concession', 'Contrast', 'Cause', 'Cause+Belief', 'Condition', 'Purpose', 'Conjunction', 'Equivalence', 'Instantiation', 'Level-of-detail', 'Manner', 'Substitution', 'Asynchronous', 'Synchronous']
-    write_labels_to_file(label1_file, label1_list)
-    write_labels_to_file(label2_file, label2_list)
+        write_labels_to_file(label1_file, label1_list)
+        write_labels_to_file(label2_file, label2_list)
+    elif "pcc" in data_dir:
+        label2_file = os.path.join(data_dir, "labels_level_2.txt")
+        label2_list = ["Cause", "Level-of-detail", "Conjunction", "Instantiation", "Contrast", "Equivalence", "Concession", "Asynchronous"]
+        write_labels_to_file(label2_file, label2_list)
 
 if __name__ == "__main__":
     #### PDTB2.0
@@ -398,3 +470,10 @@ if __name__ == "__main__":
         mode = "test"
         # refine_raw_data_pdtb3(source_dir=source_dir, gold_dir=gold_dir, data_list=test_sections[idx], output_dir=output_dir, mode=mode)
         # generate_label_file(output_dir)
+
+
+    #### PCC
+    ## Xval
+    source_dir = "data/dataset/pcc/raw"
+    output_dir = "data/dataset/pcc/xval"
+    # refine_raw_data_pcc(source_dir, output_dir)
