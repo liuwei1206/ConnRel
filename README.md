@@ -9,9 +9,19 @@ Our working environment is Python 3.8. Before you run the code, please make sure
 Then you need to download roberta-base from [here](https://huggingface.co/roberta-base/tree/main), and put it under the folder "data/pretrained_models/roberta-base".
 
 ## 2. Data and Preprocessing
-For PDTB 2.0, copy the raw corpus under the folder "data/dataset/pdtb2/raw", and then do preprocessing via `python3 preprocessing`. (you may need to modify some easy codes in main function of preprocesing.py). The raw corpus looks like: 00, 01, 02, ..., 24.
+For PDTB 2.0, 
+1. copy the raw corpus under the folder "data/dataset/pdtb2/raw", 
+2. do preprocessing via `python3 preprocessing`. (you may need to active some codes in main function of preprocesing.py). The raw corpus looks like: 00, 01, 02, ..., 24.
 
-For PDTB 3.0, copy the raw corpus under the folder "data/dataset/pdtb3/raw/gold" and "data/dataset/pdtb3/raw/data", where the former is label files and the latter is text files. Then, do preprocessing via `python3 preprocessing`. (you may need to modify some easy codes in main function of preprocesing.py). The corpus in both raw/gold and raw/data looks like: 00, 01, 02, ..., 24.
+For PDTB 3.0, 
+1. copy the raw corpus under the folder "data/dataset/pdtb3/raw/gold" and "data/dataset/pdtb3/raw/data", where the former is label files and the latter is text files. 
+2. do preprocessing via `python3 preprocessing`. (you may need to active some codes in main function of preprocesing.py). The corpus in both raw/gold and raw/data looks like: 00, 01, 02, ..., 24.
+
+For PCC, 
+1. Download raw corpus from [here](http://angcl.ling.uni-potsdam.de/resources/pcc2.2.zip) and unzip the file. 
+2. Go into the unzip directory, do `python3 connectives_xml2tsv.py`. It will generate a file called "pcc_discourse_relations_all.tsv". 
+3. Put the file "pcc_discourse_relations_all.tsv" under the folder "data/dataset/pcc/raw".
+4. Do preprocessing via `python3 preprocessing`. (you may need to active some codes in main function of preprocesing.py).
 
 ## 3. Run
 For PDTB 2.0, you can directly run each script. For instance, you can do `sh run_joint.sh` to reproduce the results of our method.
