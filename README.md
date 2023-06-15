@@ -1,5 +1,6 @@
 # Annotation-Inspired Implicit Discourse Relation Classification with Auxiliary Discourse Connective Generation
-Code for the ACL 2023 paper "Annotation-Inspired Implicit Discourse Relation Classification with Auxiliary Discourse Connective Generation"
+Code for our paper "Annotation-Inspired Implicit Discourse Relation Classification with Auxiliary Discourse Connective Generation"
+<!-- Code for the ACL 2023 paper "Annotation-Inspired Implicit Discourse Relation Classification with Auxiliary Discourse Connective Generation" -->
 
 If any questions, please contact the email: willie1206@163.com
 
