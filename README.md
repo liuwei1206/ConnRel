@@ -33,3 +33,13 @@ Then you need to download roberta-base from [here](https://huggingface.co/robert
 
 ## 4. Citation
 You can cite our paper through:
+```
+@misc{liu2023annotationinspired,
+      title={Annotation-Inspired Implicit Discourse Relation Classification with Auxiliary Discourse Connective Generation}, 
+      author={Wei Liu and Michael Strube},
+      year={2023},
+      eprint={2306.06480},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
