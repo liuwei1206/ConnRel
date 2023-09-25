@@ -10,7 +10,7 @@ Then you need to download roberta-base from [here](https://huggingface.co/robert
 
 ## 2. Data and Preprocessing
 **For PDTB 2.0**
-1. copy the raw corpus under the folder "data/dataset/pdtb2/raw", 
+1. copy the raw corpus (folder with .pdtb files) under the folder "data/dataset/pdtb2/raw", 
 2. do preprocessing via `python3 preprocessing`. (you may need to active some codes in main function of preprocesing.py). The raw corpus looks like: 00, 01, 02, ..., 24.
 
 **For PDTB 3.0**
