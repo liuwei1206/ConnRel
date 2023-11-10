@@ -301,7 +301,10 @@ class JointRobertaBaseDataset(Dataset):
                     tokens = tokens + ["</s>"]
                     token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
                     mask_position_id = len(tokens_1) + 1
-                    assert mask_position_id < self.max_seq_length, (mask_position_id, self.max_seq_length)
+                    # assert mask_position_id < self.max_seq_length, (mask_position_id, self.max_seq_length)
+                    if mask_position_id >= self.max_seq_length:
+                        print("Exceed max sequence length....")
+                        continue
                     if connectives in self.connective_list:
                         conn_id = self.connective_list.index(connectives)
                     else:
