@@ -67,7 +67,26 @@ def getTextByName(text_array, str_name):
 
     return ", ".join(raw_text)
 
-def pdtb2_sample_reader(text_array):
+def getArg1End(text_array, str_name):
+    array_size = len(text_array)
+    start_pos = -1
+    for idx in range(array_size):
+        text = text_array[idx]
+        if str_name in text:
+            start_pos = idx
+            break
+    if start_pos == -1:
+        print("No such attribution!!!")
+        return None
+    boundary_line = text_array[start_pos+1]
+    bound_items = boundary_line.split(";")
+    if len(bound_items) > 0:
+        end_id = int(bound_items[-1].split("..")[-1])
+        return end_id
+    else:
+        return null
+
+def pdtb2_sample_reader(text_array, raw_text_data=None):
     relation_type = ""
     relation_class = ""
     conn = ""
@@ -89,6 +108,7 @@ def pdtb2_sample_reader(text_array):
         conn, relation_class = getConnLabel(text_array, is_altlex=True)
     arg1 = getTextByName(text_array, "____Arg1____")
     arg2 = getTextByName(text_array, "____Arg2____")
+    arg1_end = getArg1End(text_array, "____Arg1____")
 
     sample = {}
     sample["relation_type"] = relation_type
@@ -97,9 +117,25 @@ def pdtb2_sample_reader(text_array):
     sample["arg1"] = arg1
     sample["arg2"] = arg2
 
+    ## for analysis
+    if raw_text_data is not None:
+        # inter-sentential or intra-sentential ?
+        if raw_text_data[arg1_end] in [".", "?", "!"]:
+            is_inter = 1
+        else:
+            is_inter = 0
+    else:
+        is_inter = -1
+    sample["is_inter"] = is_inter
+
     return sample
 
 def pdtb2_file_reader(input_file):
+    text_file = input_file.replace("raw", "text").split(".")[0]
+    if os.path.exists(text_file):
+        raw_text_data = open(text_file, "r", encoding="latin1").read()
+    else:
+        raw_text_data = None
     all_samples = []
     with open(input_file, "r", encoding="ISO-8859-1") as f:
         lines = f.readlines()
@@ -114,7 +150,7 @@ def pdtb2_file_reader(input_file):
         boundary_size = len(sample_boundaries)
         for idx in range(boundary_size-1):
             sample_lines = lines[sample_boundaries[idx]:sample_boundaries[idx+1]]
-            sample = pdtb2_sample_reader(sample_lines)
+            sample = pdtb2_sample_reader(sample_lines, raw_text_data)
             all_samples.append(sample)
             # if sample["relation_type"] == "Implicit":
             #     all_samples.append(sample)
@@ -185,6 +221,7 @@ def pdtb3_file_reader(data_file, label_file):
                     arg1 = text_data[int(arg1_i):int(arg1_j)+1]
                     arg1_str.append(re.sub("\n", " ", arg1))
                 arg1 = ", ".join(arg1_str)
+                arg1_end = int(arg1_idx[-1].split("..")[-1])
 
                 arg2_str = []
                 for pairs in arg2_idx:
@@ -232,6 +269,12 @@ def pdtb3_file_reader(data_file, label_file):
                 sample["arg1"] = arg1
                 sample["arg2"] = arg2
                 sample["annotate_flag"] = annotate_flag
+
+                if text_data[arg1_end] in [".", "!", "?"]:
+                    is_inter = 1
+                else:
+                    is_inter = 0
+                sample["is_inter"] = is_inter
                 all_samples.append(sample)
 
     return all_samples
@@ -411,12 +454,12 @@ if __name__ == "__main__":
         output_dir = "data/dataset/pdtb2/xval/fold_{}".format(idx + 1)
         os.makedirs(output_dir, exist_ok=True)
         mode = "train"
-        refine_raw_data_pdtb2(source_dir, train_sections[idx], output_dir, mode)
+        # refine_raw_data_pdtb2(source_dir, train_sections[idx], output_dir, mode)
         mode = "dev"
-        refine_raw_data_pdtb2(source_dir, dev_sections[idx], output_dir, mode)
+        # refine_raw_data_pdtb2(source_dir, dev_sections[idx], output_dir, mode)
         mode = "test"
-        refine_raw_data_pdtb2(source_dir, test_sections[idx], output_dir, mode)
-        generate_label_file(output_dir)
+        # refine_raw_data_pdtb2(source_dir, test_sections[idx], output_dir, mode)
+        # generate_label_file(output_dir)
 
 
     #### PDTB3.0
