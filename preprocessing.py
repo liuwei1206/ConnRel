@@ -86,7 +86,7 @@ def getArg1End(text_array, str_name):
     else:
         return null
 
-def pdtb2_sample_reader(text_array, raw_text_data=None):
+def pdtb2_sample_reader(text_array, raw_text_data=None, doc_name=None):
     relation_type = ""
     relation_class = ""
     conn = ""
@@ -116,6 +116,7 @@ def pdtb2_sample_reader(text_array, raw_text_data=None):
     sample["conn"] = conn
     sample["arg1"] = arg1
     sample["arg2"] = arg2
+    sample["doc_id"] = doc_name
 
     ## for analysis
     if raw_text_data is not None:
@@ -132,6 +133,7 @@ def pdtb2_sample_reader(text_array, raw_text_data=None):
 
 def pdtb2_file_reader(input_file):
     text_file = input_file.replace("raw", "text").split(".")[0]
+    doc_name = text_file.split("/")[-1].strip()
     if os.path.exists(text_file):
         raw_text_data = open(text_file, "r", encoding="latin1").read()
     else:
@@ -150,7 +152,7 @@ def pdtb2_file_reader(input_file):
         boundary_size = len(sample_boundaries)
         for idx in range(boundary_size-1):
             sample_lines = lines[sample_boundaries[idx]:sample_boundaries[idx+1]]
-            sample = pdtb2_sample_reader(sample_lines, raw_text_data)
+            sample = pdtb2_sample_reader(sample_lines, raw_text_data, doc_name)
             all_samples.append(sample)
             # if sample["relation_type"] == "Implicit":
             #     all_samples.append(sample)
@@ -200,7 +202,7 @@ def pdtb3_file_reader(data_file, label_file):
 
     with open(data_file, "r", encoding="latin1") as f: # utf-8
         text_data = f.read()
-
+    doc_name = data_file.split("/")[-1].strip()
     with open(label_file, "r", encoding="latin1") as f: # utf-8
         lines = f.readlines()
         for line in lines:
@@ -269,6 +271,7 @@ def pdtb3_file_reader(data_file, label_file):
                 sample["arg1"] = arg1
                 sample["arg2"] = arg2
                 sample["annotate_flag"] = annotate_flag
+                sample["doc_id"] = doc_name
 
                 if text_data[arg1_end] in [".", "!", "?"]:
                     is_inter = 1
