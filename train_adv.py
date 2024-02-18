@@ -479,7 +479,7 @@ def main():
     ## 1. prepare data
     data_dir = os.path.join(args.data_dir, args.dataset)
     if args.fold_id == -1:
-        data_dir = os.path.join(data_dir, "fine")
+        data_dir = os.path.join(data_dir, "fine-v1")
     else:
         assert args.fold_id in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], (args.fold_id)
         data_dir = os.path.join(data_dir, "xval")
@@ -491,7 +491,7 @@ def main():
         output_dir = os.path.join(output_dir, "xval")
         output_dir = os.path.join(output_dir, "fold_{}".format(args.fold_id))
     else:
-        output_dir = os.path.join(output_dir, "fine")
+        output_dir = os.path.join(output_dir, "fine-v1")
     train_data_file = os.path.join(data_dir, "train.json")
     dev_data_file = os.path.join(data_dir, "dev.json")
     test_data_file = os.path.join(data_dir, "test.json")

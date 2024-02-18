@@ -67,7 +67,7 @@ def getTextByName(text_array, str_name):
 
     return ", ".join(raw_text)
 
-def getArg1End(text_array, str_name):
+def getArgEnd(text_array, str_name):
     array_size = len(text_array)
     start_pos = -1
     for idx in range(array_size):
@@ -85,6 +85,42 @@ def getArg1End(text_array, str_name):
         return end_id
     else:
         return null
+
+def getArgBound(text_array, str_name):
+    array_size = len(text_array)
+    start_pos = -1
+    for idx in range(array_size):
+        text = text_array[idx]
+        if str_name in text:
+            start_pos = idx
+            break
+    if start_pos == -1:
+        print("No such attribution!!!")
+        return None
+    boundary_line = text_array[start_pos + 1]
+    bound_items = boundary_line.split(";")
+    if len(bound_items) > 0:
+        start_id = int(bound_items[0].split("..")[0])
+        end_id = int(bound_items[-1].split("..")[-1])
+        return start_id, end_id
+    else:
+        return null
+
+def searchContext(text_data, pos_id, to_left=True):
+    if to_left:
+        cur_id = pos_id-1
+        context = ""
+        while cur_id >=0 and text_data[cur_id] not in [".", "?", "!"]:
+            context = text_data[cur_id] + context
+            cur_id -= 1
+    else:
+        cur_id = pos_id+1
+        context = ""
+        while cur_id < len(text_data) and text_data[cur_id] not in [".", "?", "!"]:
+            context = context + text_data[cur_id]
+            cur_id += 1
+
+    return context.strip()
 
 def pdtb2_sample_reader(text_array, raw_text_data=None, doc_name=None):
     relation_type = ""
@@ -108,14 +144,16 @@ def pdtb2_sample_reader(text_array, raw_text_data=None, doc_name=None):
         conn, relation_class = getConnLabel(text_array, is_altlex=True)
     arg1 = getTextByName(text_array, "____Arg1____")
     arg2 = getTextByName(text_array, "____Arg2____")
-    arg1_end = getArg1End(text_array, "____Arg1____")
+    arg1_end = getArgEnd(text_array, "____Arg1____")
+    arg1_start_id, arg1_end_id = getArgBound(text_array, "____Arg1____")
+    arg2_start_id, arg2_end_id = getArgBound(text_array, "____Arg2____")
 
     sample = {}
     sample["relation_type"] = relation_type
     sample["relation_class"] = relation_class
     sample["conn"] = conn
-    sample["arg1"] = arg1
-    sample["arg2"] = arg2
+    sample["arg1"] = arg1 + raw_text_data[arg1_end_id]
+    sample["arg2"] = arg2 + raw_text_data[arg2_end_id]
     sample["doc_id"] = doc_name
 
     ## for analysis
@@ -128,6 +166,12 @@ def pdtb2_sample_reader(text_array, raw_text_data=None, doc_name=None):
     else:
         is_inter = -1
     sample["is_inter"] = is_inter
+
+    ## for context
+    pre_sent = searchContext(raw_text_data, arg1_start_id)
+    next_sent = searchContext(raw_text_data, arg2_end_id, to_left=False)
+    sample["pre_sent"] = pre_sent
+    sample["next_sent"] = next_sent
 
     return sample
 
@@ -216,13 +260,16 @@ def pdtb3_file_reader(data_file, label_file):
                 conn2_sense1 = items[11].strip()
 
                 arg1_idx = items[14].split(";")
+                arg1_idx = [item for item in arg1_idx if item.strip() != ""]
                 arg2_idx = items[20].split(";")
+                arg2_idx = [item for item in arg2_idx if item.strip() != ""]
                 arg1_str = []
                 for pairs in arg1_idx:
                     arg1_i, arg1_j = pairs.split("..")
                     arg1 = text_data[int(arg1_i):int(arg1_j)+1]
                     arg1_str.append(re.sub("\n", " ", arg1))
                 arg1 = ", ".join(arg1_str)
+                arg1_start = int(arg1_idx[0].split("..")[0])
                 arg1_end = int(arg1_idx[-1].split("..")[-1])
 
                 arg2_str = []
@@ -233,6 +280,8 @@ def pdtb3_file_reader(data_file, label_file):
                     arg2 = text_data[int(arg2_i):int(arg2_j)+1]
                     arg2_str.append(re.sub("\n", " ", arg2))
                 arg2 = ", ".join(arg2_str)
+                arg2_start = int(arg2_idx[0].split("..")[0])
+                arg2_end = int(arg2_idx[-1].split("..")[-1])
 
                 if int(arg1_idx[0].split("..")[0]) > int(arg2_idx[0].split("..")[0]):
                     tmp = arg1
@@ -278,6 +327,13 @@ def pdtb3_file_reader(data_file, label_file):
                 else:
                     is_inter = 0
                 sample["is_inter"] = is_inter
+
+                ## for context
+                pre_sent = searchContext(text_data, arg1_start)
+                next_sent = searchContext(text_data, arg2_end, to_left=False)
+                sample["pre_sent"] = pre_sent
+                sample["next_sent"] = next_sent
+
                 all_samples.append(sample)
 
     return all_samples
